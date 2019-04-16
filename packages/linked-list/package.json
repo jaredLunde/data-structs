@@ -1,0 +1,37 @@
+{
+  "name": "@data-structs/linked-list",
+  "version": "1.0.14",
+  "main": "dist/cjs/index.js",
+  "module": "dist/es/index.js",
+  "author": "Jared Lunde <jared@BeStellar.co> (https://BeStellar.co)",
+  "license": "MIT",
+  "sideEffects": false,
+  "repository": "https://github.com/jaredLunde/data-structs/tree/master/packages/linked-list",
+  "scripts": {
+    "build": "yarn run build:es && yarn run build:cjs",
+    "build:es": "rimraf dist/es && cross-env NODE_ENV=production BABEL_ENV=es babel src --out-dir dist/es --ignore **/*.test.js && npm run prettier:es",
+    "build:cjs": "rimraf dist/cjs && cross-env NODE_ENV=production BABEL_ENV=cjs babel src --out-dir dist/cjs --ignore **/*.test.js && npm run prettier:cjs",
+    "watch:es": "rimraf dist/es && cross-env NODE_ENV=production BABEL_ENV=es babel src -w --out-dir dist/es --ignore **/*.test.js",
+    "prettier": "prettier --single-quote --no-semi --no-bracket-spacing --trailing-comma es5 --write",
+    "prettier:es": "yarn prettier \"dist/es/**/*.js\"",
+    "prettier:cjs": "yarn prettier \"dist/cjs/**/*.js\"",
+    "prepublishOnly": "yarn test && yarn build",
+    "test": "BABEL_ENV=cjs ava -v"
+  },
+  "devDependencies": {
+    "@babel/register": "^7.4.0",
+    "@stellar-apps/babel-preset-es": "^1.0.4",
+    "ava": "^1.4.1",
+    "performance-now": "^2.1.0",
+    "prettier": "^1.16.4",
+    "rimraf": "^2.6.3"
+  },
+  "ava": {
+    "files": [
+      "src/**/*.test.js"
+    ],
+    "require": [
+      "@babel/register"
+    ]
+  }
+}
