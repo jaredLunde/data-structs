@@ -1,6 +1,6 @@
 {
   "name": "@data-structs/linked-list",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "main": "dist/cjs/index.js",
   "module": "dist/es/index.js",
   "author": "Jared Lunde <jared@BeStellar.co> (https://BeStellar.co)",
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@babel/register": "^7.4.0",
+    "@essentials/benchmark": "^1.0.4",
     "@stellar-apps/babel-preset-es": "^1.0.4",
     "ava": "^1.4.1",
     "performance-now": "^2.1.0",

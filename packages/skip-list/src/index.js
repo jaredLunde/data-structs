@@ -53,7 +53,7 @@ export const visualize = s => {
   console.log('[0]', s.toJSON())
   // t.is(s.toJSON().length, s.size)
   let i = 0
-  s.___levels.forEach(
+  s.___height.forEach(
     l => {
       console.log(`[${++i}]`, l.toJSON())
     }
@@ -63,7 +63,7 @@ export const visualize = s => {
 const randomChoice = potential => potential[Math.floor(Math.random() * potential.length)]
 
 // rather than using a coin-flip we use something that is more predictably self-balancing
-export const getLevel = (n, levels) => {
+export const getLevel = (n, height) => {
   let
     // sets the max-level to be inline with O(log n) lookups
     max = Math.floor(Math.log2(n)),
@@ -71,7 +71,7 @@ export const getLevel = (n, levels) => {
     maybeLevel = 1
 
   for (; maybeLevel <= max; maybeLevel++) {
-    let level = levels[maybeLevel - 1]
+    let level = height[maybeLevel - 1]
 
     const
       // this is the expected number of elements we should see in this level
@@ -105,10 +105,10 @@ export const skipList = (initialValues, cmp = defaultCmp) => {
     head = list.___head,
     tail = list.___tail,
     size = list.___size,
-    levels = []
+    height = []
 
-  list.___levels = levels
-  Object.defineProperty(list, '___levels', {value: levels, writable: false})
+  list.___height = height
+  Object.defineProperty(list, '___height', {value: height, writable: false})
 
   const doInsert = value => {
     if (size.current < 2) {
@@ -118,16 +118,18 @@ export const skipList = (initialValues, cmp = defaultCmp) => {
       else
         appendLeft(list, insertNode)(value)
     }
-    else if (levels.length === 0) {
+    else if (height.length === 0) {
       // we need to create our first level
-      let node
+      let node, next = head.current
 
-      for (let next of iter(head.current)) {
+      while (next !== null) {
         if (cmp(value, next.value) <= 0) {
           node = insertNode(null, value, next)
           if (next === head.current) head.current = node
           break
         }
+
+        next = next.next
       }
 
       if (node === void 0)
@@ -135,12 +137,12 @@ export const skipList = (initialValues, cmp = defaultCmp) => {
 
       const level = createLevel(list)
       level.insert(null, node)
-      levels.push(level)
+      height.push(level)
       ++size.current
     }
     else {
       // searches for the proper insertion point and most efficient insertion method
-      let node, topLevel = getLevel(size.current + 1, levels)
+      let node, topLevel = getLevel(size.current + 1, height)
 
       // O(1) head/tail insertion
       if (cmp(value, head.current.value) <= 0) {
@@ -149,7 +151,7 @@ export const skipList = (initialValues, cmp = defaultCmp) => {
         let levelIdx = topLevel
 
         while (levelIdx > 0) {
-          const level = levels[topLevel - levelIdx--]
+          const level = height[topLevel - levelIdx--]
           if (level === void 0) break
           node = level.appendLeft(node)
         }
@@ -160,7 +162,7 @@ export const skipList = (initialValues, cmp = defaultCmp) => {
         let levelIdx = topLevel
 
         while (levelIdx > 0) {
-          const level = levels[topLevel - levelIdx--]
+          const level = height[topLevel - levelIdx--]
           if (level === void 0) break
           node = level.append(node)
         }
@@ -168,9 +170,9 @@ export const skipList = (initialValues, cmp = defaultCmp) => {
       else {
         // O(log n) search insertion
         let
-          next = levels[levels.length - 1].peekLeft(),
+          next = height[height.length - 1].peekLeft(),
           insertionPath = [],
-          levelIdx = levels.length
+          levelIdx = height.length
 
         const insertPath = (next) => {
           if (levelIdx-- <= topLevel)
@@ -199,7 +201,7 @@ export const skipList = (initialValues, cmp = defaultCmp) => {
               if (next.next === null) {
                 node = insertNode(next, value)
                 tail.current = node
-                next = null
+                break
               }
               else
                 next = next.next
@@ -216,9 +218,9 @@ export const skipList = (initialValues, cmp = defaultCmp) => {
         }
 
         levelIdx = 0
-        while (levelIdx < levels.length) {
+        while (levelIdx < height.length) {
           const
-            level = levels[levelIdx++],
+            level = height[levelIdx++],
             afterNode = insertionPath.pop()
           if (afterNode === void 0) break
           node = level.insert(afterNode, node)
@@ -226,9 +228,9 @@ export const skipList = (initialValues, cmp = defaultCmp) => {
       }
 
       // creates any new levels and inserts the latest node
-      while (topLevel > levels.length) {
-        levels.push(createLevel(levels[levels.length - 1]))
-        node = levels[levels.length - 1].append(node)
+      while (topLevel > height.length) {
+        height.push(createLevel(height[height.length - 1]))
+        node = height[height.length - 1].append(node)
       }
 
       return ++size.current
@@ -277,11 +279,11 @@ export const skipList = (initialValues, cmp = defaultCmp) => {
         if (visited !== void 0) {
           let i = 0
           while (visited.length > 0) {
-            const level = levels[i++]
+            const level = height[i++]
             level.remove(visited.pop())
             // deletes the level if it is now empty
             if (level.size === 0)
-              levels.splice(--i, 1)
+              height.splice(--i, 1)
           }
         }
         // removes the value from the base
@@ -295,13 +297,13 @@ export const skipList = (initialValues, cmp = defaultCmp) => {
   }
 
   const findNode = (cmp = defaultAreEqual) => {
-    let headLevel = levels[levels.length - 1]
+    let headLevel = height[height.length - 1]
     headLevel = headLevel === void 0 ? list : headLevel
     if (headLevel.size === 0) return
 
     let
       next = headLevel.___head.current,
-      levelIdx = levels.length
+      levelIdx = height.length
     // determines if the value is the head or if its out of range to the left
     if (cmp(head.current.value) < 0) return
     // determines if the value is the tail or if its out of range to the right
@@ -362,7 +364,7 @@ export const skipList = (initialValues, cmp = defaultCmp) => {
     head.current = null
     tail.current = null
     size.current = 0
-    levels.length = 0
+    height.length = 0
   }
 
   delete list.append

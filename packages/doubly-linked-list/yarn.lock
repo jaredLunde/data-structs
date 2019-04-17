@@ -822,10 +822,10 @@
   dependencies:
     arrify "^1.0.1"
 
-"@data-structs/linked-list@^1.0.12":
-  version "1.0.12"
-  resolved "https://registry.yarnpkg.com/@data-structs/linked-list/-/linked-list-1.0.12.tgz#9eee721a6db4c45b48b58be16ee0afcb057729c2"
-  integrity sha512-u9qRIkJS9oPrUhLLjuOXf8FpvS3TzxQJ3KVuJD41GAEpihBgtxhH7mL58cTIEr29FGba9165rttNKFHaG0a2nA==
+"@data-structs/linked-list@^1.0.15":
+  version "1.0.15"
+  resolved "https://registry.yarnpkg.com/@data-structs/linked-list/-/linked-list-1.0.15.tgz#7e6ac2fa948c9332d9cf85df082bc4c5a9caa7a0"
+  integrity sha512-ijbxSzD8Uobo8pDSM4uEekZKtE3sU65jxoHi8D162AD6D9UsOclB+/Be0JRC47pBKOctU0PEZKLnGxb5AkHmOg==
 
 "@stellar-apps/babel-preset-es@^1.0.4":
   version "1.0.4"

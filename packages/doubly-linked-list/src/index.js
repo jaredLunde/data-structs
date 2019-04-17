@@ -49,7 +49,7 @@ export const removeNode = (left = null, node, right = null) => {
       node.prev.next = node.next
   }
 }
-
+/*
 export const iterLeft = (tail, prop) => {
   let prev = tail
 
@@ -65,7 +65,7 @@ export const iterLeft = (tail, prop) => {
     [Symbol.iterator] () { return this }
   }
 }
-
+*/
 export const doublyLinkedList = initialValues => {
   const
     list = linkedList(),
@@ -78,22 +78,35 @@ export const doublyLinkedList = initialValues => {
   list.insertBefore = insertBefore(list, insertNode)
   list.remove = remove(list, removeNode)
   list.reverse = () => {
-    for (let item of iterLeft(tail.current)) {
+    let item = tail.current
+
+    while (item !== null) {
       const prev = item.next
       item.next = item.prev
       item.prev = prev
+      item = item.next
     }
 
     const head_ = head.current
     head.current = tail.current
     tail.current = head_
   }
-  list.forEachLeft = fn => { for (let item of iterLeft(tail.current, 'value')) fn(item) }
-  list.mapLeft = fn => {
-    const nextList = linkedList()
 
-    for (let item of iterLeft(tail.current, 'value'))
-      nextList.append(fn(item))
+  list.forEachLeft = fn => {
+    let prev = tail.current
+    while (prev !== null) {
+      fn(prev.value)
+      prev = prev.prev
+    }
+  }
+
+  list.mapLeft = fn => {
+    let prev = tail.current, nextList = linkedList()
+
+    while (prev !== null) {
+      nextList.append(fn(prev.value))
+      prev = prev.prev
+    }
 
     return nextList
   }

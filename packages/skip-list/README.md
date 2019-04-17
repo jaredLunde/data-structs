@@ -2,9 +2,10 @@
 A generalized self-balancing skip list implemented in Javascript. You
 can insert any value types you wish so long as you provide your own
 comparator function. The default comparator is `(a, b) => a - b` which
-only allows for numeric comparisons.
+only allows for numeric comparisons. As you might guess, values are
+considered equal when the comparator function returns `0`.
 
-The algorithm for level-selection is more predictably balanced than a
+The algorithm for height-selection is more predictably balanced than a
 traditional coin-flip model while maintaining an element of randomness
 in selections. This is accomplished by randomly selecting levels where
 the expected number of elements is fewer than the actual number of
@@ -42,13 +43,12 @@ skipList.forEach(console.log)
 - `O(1)` insert at head + tail
   - Ultra-fast inserts when the inserted value is certainly less than or
     equal to the head or certainly greater than or equal to the tail
-- `O(log n)` insert with high probability at mid
+- `O(log(n))` insert at mid with high probability
 - `O(1)` remove at head + tail
   - Ultra-fast inserts when the removed value is certainly the head
     or certainly the tail
-- `O(log n)` remove at mid
-- `O(log n)` search with high probability
+- `O(log(n))` remove at mid with high probability
+- `O(log(n))` search with high probability
 - `O(1)` search bailout when value is certainly less than the head value
   or certainly greater than the tail value
-
-
+- `O(n log(n))` space complexity 

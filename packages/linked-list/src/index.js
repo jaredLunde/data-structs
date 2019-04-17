@@ -79,13 +79,15 @@ export const insertAfter = (list, insertNode) => {
   const head = list.___head, tail = list.___tail, size = list.___size
 
   return function insertAfter_ (afterValue, value, afterLast) {
-    let afterNode = null
+    let afterNode = null, next = head.current
 
-    for (let next of iter(head.current)) {
+    while (next !== null) {
       if (next.value === afterValue) {
         afterNode = next
         if (afterLast !== true) break
       }
+
+      next = next.next
     }
 
     if (afterNode === null)
@@ -104,9 +106,9 @@ export const insertBefore = (list, insertNode) => {
   const head = list.___head, size = list.___size
 
   return function insertBefore_ (beforeValue, value, beforeLast) {
-    let leftNode = null, rightNode = null, prev = null
+    let leftNode = null, rightNode = null, prev = null, next = head.current
 
-    for (let next of iter(head.current)) {
+    while (next !== null) {
       if (next.value === beforeValue) {
         leftNode = prev
         rightNode = next
@@ -114,6 +116,7 @@ export const insertBefore = (list, insertNode) => {
       }
 
       prev = next
+      next = next.next
     }
 
     if (rightNode === null)
@@ -132,9 +135,9 @@ export const remove = (list, removeNode) => {
   const head = list.___head, tail = list.___tail, size = list.___size
 
   return function remove_ (value, all) {
-    let prev = null
+    let prev = null, next = head.current
 
-    for (let next of iter(head.current)) {
+    while (next !== null) {
       if (next.value === value) {
         removeNode(prev, next)
 
@@ -145,11 +148,12 @@ export const remove = (list, removeNode) => {
           tail.current = prev
 
         size.current--
-
         if (all !== true) break
+        next = next.next
       }
       else {
         prev = next
+        next = next.next
       }
     }
 
@@ -168,11 +172,13 @@ export const linkedList = initialValues => {
     peekLeft () { return head.current && head.current.value },
     pop () {
       if (size.current === 0) return
-      const result = tail.current.value, prev = tail.current
+      let result = tail.current.value, prev = tail.current, next = head.current
 
-      for (let item of iter(head.current))
-        if (prev !== item)
-          tail.current = item
+      while (next !== null) {
+        if (prev !== next)
+          tail.current = next
+        next = next.next
+      }
 
       tail.current.next = null
       size.current--
@@ -191,9 +197,12 @@ export const linkedList = initialValues => {
       return result
     },
     has (value) {
-      for (let item of iter(head.current))
-        if (item.value === value)
-          return true
+      let next = head.current
+
+      while (next !== null) {
+        if (next.value === value) return true
+        next = next.next
+      }
 
       return false
     },
@@ -204,16 +213,26 @@ export const linkedList = initialValues => {
       return size.current
     },
     copy: () => linkedList(list),
-    forEach (fn) { for (let item of list) fn(item) },
+    forEach (fn) {
+      let next = head.current
+      while (next !== null) {
+        fn(next.value)
+        next = next.next
+      }
+    },
     map (fn) {
-      const nextList = linkedList()
-
-      for (let item of list)
-        nextList.append(fn(item))
-
+      let next = head.current, nextList = linkedList()
+      while (next !== null) {
+        nextList.append(fn(next.value))
+        next = next.next
+      }
       return nextList
     },
-    toJSON: () => [...list],
+    toJSON: () => {
+      const result = []
+      list.forEach(result.push.bind(result))
+      return result
+    },
     toString: () => JSON.stringify(list),
     [Symbol.iterator] () { return iter(head.current, 'value') }
   }

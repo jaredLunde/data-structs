@@ -1,4 +1,5 @@
 import test from 'ava'
+import bench from '@essentials/benchmark'
 import list from './index'
 
 const randomValues = (num = 16) =>
@@ -216,3 +217,93 @@ test('toJSON', t => {
   t.is(JSON.stringify(l), '["a","b","c"]')
   t.true(Array.isArray(l.toJSON()))
 })
+
+bench(
+  'list.append',
+  b => {
+    const arr = list(Array.from(Array(10000), () => 2))
+    b.after(() => arr.popLeft())
+    return () => arr.append(1)
+  }
+)
+
+bench(
+  'Array.push',
+  b => {
+    const arr = Array.from(Array(100000), () => 2)
+    b.after(() => arr.pop())
+    return () => arr.push(1)
+  }
+)
+
+bench(
+  'list.appendLeft',
+  b => {
+    const arr = list(Array.from(Array(100000), () => 2))
+    b.after(() => arr.popLeft())
+    return () => arr.appendLeft(1)
+  }
+)
+
+bench(
+  'Array.shift',
+  b => {
+    const arr = Array.from(Array(100000), () => 2)
+    b.after(() => arr.pop())
+    return () => arr.unshift(1)
+  }
+)
+
+bench(
+  'list.has',
+  b => {
+    const arr = list(Array.from(Array(100000), () => 2))
+    arr.append(1)
+    b.after(() => arr.popLeft())
+    return () => arr.has(1)
+  }
+)
+
+bench(
+  'Array.indexOf',
+  b => {
+    const arr = Array.from(Array(100000), () => 2)
+    arr.push(1)
+    b.after(() => arr.pop())
+    return () => arr.indexOf(1) > -1
+  }
+)
+
+bench(
+  'list.remove',
+  b => {
+    const arr = list(Array.from(Array(100000), () => 2))
+    b.before(() => arr.append(1))
+    return () => arr.remove(1)
+  }
+)
+
+bench(
+  'Array.splice(Array.indexOf(n), 1)',
+  b => {
+    const arr = Array.from(Array(100000), () => 2)
+    b.before(() => arr.push(1))
+    return () => arr.splice(arr.indexOf(1), 1)
+  }
+)
+
+bench(
+  'list.forEach',
+  b => {
+    const arr = list(Array.from(Array(100000), () => 2))
+    return () => arr.forEach(v => v)
+  }
+)
+
+bench(
+  'Array.forEach',
+  b => {
+    const arr = Array.from(Array(100000), () => 2)
+    return () => arr.forEach(v => v)
+  }
+)

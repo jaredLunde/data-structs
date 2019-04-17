@@ -1,6 +1,6 @@
 {
   "name": "@data-structs/doubly-linked-list",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "dist/cjs/index.js",
   "author": "Jared Lunde <jared@BeStellar.co> (https://BeStellar.co)",
   "license": "MIT",
@@ -34,6 +34,6 @@
     "rimraf": "^2.6.3"
   },
   "dependencies": {
-    "@data-structs/linked-list": "^1.0.12"
+    "@data-structs/linked-list": "^1.0.15"
   }
 }

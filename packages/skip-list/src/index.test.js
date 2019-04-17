@@ -1,6 +1,6 @@
 import test from 'ava'
 import skipList from './index'
-import chalk from 'chalk'
+import bench from '@essentials/benchmark'
 
 const randomChoice = potential => potential[Math.floor(Math.random() * potential.length)]
 const randomValues = (num = 16) =>
@@ -14,7 +14,7 @@ test('insert 1', t => {
   t.is(s.peekLeft(), 5)
   t.is(s.peek(), 5)
   t.is(s.size, 1)
-  t.is(s.___levels.length, 0)
+  t.is(s.___height.length, 0)
 })
 
 test('insert 2', t => {
@@ -34,7 +34,7 @@ test('insert 2', t => {
   t.is(s.peek(), 5)
   t.is(s.size, 2)
 
-  t.is(s.___levels.length, 0)
+  t.is(s.___height.length, 0)
 })
 
 test('insert 3', t => {
@@ -46,7 +46,7 @@ test('insert 3', t => {
   t.is(s.peekLeft(), 5)
   t.is(s.peek(), 7)
   t.is(s.size, 3)
-  t.is(s.___levels.length, 1)
+  t.is(s.___height.length, 1)
 
   s = skipList()
   s.insert(5)
@@ -56,7 +56,7 @@ test('insert 3', t => {
   t.is(s.peekLeft(), 5)
   t.is(s.peek(), 7)
   t.is(s.size, 3)
-  t.is(s.___levels.length, 1)
+  t.is(s.___height.length, 1)
 
   s = skipList()
   s.insert(5)
@@ -66,7 +66,7 @@ test('insert 3', t => {
   t.is(s.peekLeft(), 4)
   t.is(s.peek(), 7)
   t.is(s.size, 3)
-  t.is(s.___levels.length, 1)
+  t.is(s.___height.length, 1)
 })
 
 test('insert 10,000', t => {
@@ -76,16 +76,16 @@ test('insert 10,000', t => {
   original.sort(cmp)
   t.deepEqual(s.toJSON(), original)
 
-  s.___levels.forEach(
+  s.___height.forEach(
     l => {
-      // ensures the upper levels are also sorted correct
+      // ensures the upper height are also sorted correct
       const check = l.toJSON()
       check.sort(cmp)
       t.deepEqual(l.toJSON(), check)
     }
   )
 
-  t.true(s.___levels.length >= 11)
+  t.true(s.___height.length >= 11)
   t.is(s.size, original.length)
 })
 
@@ -112,7 +112,7 @@ test('remove', t => {
     t.is(s.remove(value), values.length)
   }
   t.is(s.size, 0)
-  t.is(s.___levels.length, 0)
+  t.is(s.___height.length, 0)
   t.is(s.remove(-3), 0)
   t.is(s.remove(17), 0)
 })
@@ -224,49 +224,19 @@ test('toJSON', t => {
   t.is(JSON.stringify(l), JSON.stringify(values))
 })
 
-
-const now = typeof window !== 'undefined' ? performance.now.bind(performance) : require('performance-now')
-
-const bench = (fn, time = 1000, opt = {}) => {
-  const fmt = x => Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  const {before, after} = opt
-  let elapsed = 0.0, iterations = 0
-
-  while (elapsed < time) {
-    if (before) {
-      before()
-    }
-
-    const start = now()
-    fn()
-    elapsed += now() - start
-
-    if (after) {
-      after()
-    }
-
-    iterations++
-  }
-
-  console.log('------------------------------------')
-  console.log(fn.toString())
-  console.log(chalk.bold(fmt(1000.0 / (elapsed / iterations))), 'op/s')
-}
-
 test('benchmarks', t => {
   console.log('Benchmarks')
   const values = [...bigListValues]
   values.sort(cmp)
-  bench(() => bigList.has(values[values.length / 2]), 1000)
-  bench(() => bigListValues.indexOf(values[values.length / 2]), 1000)
-  bench(() => bigList.has(values[values.length - 1]), 1000)
-  bench(() => bigListValues.indexOf(values[values.length - 1]), 1000)
-  bench(() => bigList.has(values[0]), 1000)
-  bench(() => bigListValues.indexOf(values[0]), 1000)
-  bench(() => { for (let value of bigList) value }, 1000)
-  bench(() => { for (let value of bigListValues) value }, 1000)
-  bench(() => skipList(), 1000)
-  bench(() => [], 1000)
+  bench(() => bigList.has(values[values.length / 2]))
+  bench(() => bigListValues.indexOf(values[values.length / 2]))
+  bench(() => bigList.has(values[values.length - 1]))
+  bench(() => bigListValues.indexOf(values[values.length - 1]))
+  bench(() => bigList.has(values[0]))
+  bench(() => bigListValues.indexOf(values[0]))
+  bench(() => bigList.forEach(v => v))
+  bench(() => bigListValues.forEach(v => v))
+  bench('create skipList()', () => skipList())
+  bench('create []', () => [])
   t.is(1, 1)
-  console.log('------------------------------------\n')
 })
